@@ -31,11 +31,15 @@ public class PathFinder : MonoBehaviour
 
     public List<WayPoint> GetPath()
     {
-        isRunning = true;
-        LoadBlocks();
-        SetColorPoints();
-        PathFind();
-        CreatePath();
+        if (path.Count == 0)
+        {
+            isRunning = true;
+            LoadBlocks();
+            SetColorPoints();
+            PathFind();
+            CreatePath();
+        }
+
         return path;
     }
 
