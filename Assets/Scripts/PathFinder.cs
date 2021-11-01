@@ -10,21 +10,47 @@ public class PathFinder : MonoBehaviour
 
     private Queue<WayPoint> queuePoints = new Queue<WayPoint>();
 
-    [SerializeField] private bool isRunning;
-
     private Vector2Int[] directions = {
         Vector2Int.up, Vector2Int.right, Vector2Int.down, Vector2Int.left
     };
 
+    private List<WayPoint> path = new List<WayPoint>();
+
     private WayPoint searchPoint;
 
-    private void Start()
+    private bool isRunning;
+
+    /*private void Start()
     {
         isRunning = true;
         LoadBlocks();
         SetColorPoints();
-        //ExploreNearPoints();
         PathFind();
+        CreatePath();
+    }*/
+
+    public List<WayPoint> GetPath()
+    {
+        isRunning = true;
+        LoadBlocks();
+        SetColorPoints();
+        PathFind();
+        CreatePath();
+        return path;
+    }
+
+    private void CreatePath()
+    {
+        path.Add(finishPoint);
+        WayPoint prevPoints = finishPoint.exploredFrom;
+        while (prevPoints != startPoint)
+        {
+            prevPoints.SetTopColor(Color.cyan);
+            path.Add(prevPoints);
+            prevPoints = prevPoints.exploredFrom;
+        }
+        path.Add(startPoint);
+        path.Reverse();
     }
 
     private void PathFind()
@@ -35,18 +61,16 @@ public class PathFinder : MonoBehaviour
         {
             searchPoint = queuePoints.Dequeue();
             searchPoint.isExplored = true;
-            print("Исследовать соседние клетки из " + searchPoint);
             CheckForEndPoint();
             ExploreNearPoints();
         }
-        print("Можем?");
     }
 
     private void CheckForEndPoint()
     {
         if (searchPoint == finishPoint)
         {
-            print("Алгоритм нашёл endPoint");
+            finishPoint.SetTopColor(Color.yellow);
             isRunning = false;
         }
     }
@@ -54,19 +78,16 @@ public class PathFinder : MonoBehaviour
     private void ExploreNearPoints()
     {
         if (!isRunning) { return; }
+
         foreach (Vector2Int direction in directions)
         {
             Vector2Int nearPoints = searchPoint.GetGridPos() + direction;
-            try
+
+            if (grid.ContainsKey(nearPoints))
             {
                 WayPoint nearPoint = grid[nearPoints];
                 AddPointToQueue(nearPoint);
             }
-            catch
-            {
-                //print("Блок" + nearPoints);
-            }
-            print("Проверено: " + nearPoints);
         }
     }
 
@@ -80,11 +101,8 @@ public class PathFinder : MonoBehaviour
         {
             nearPoint.SetTopColor(Color.black);
             queuePoints.Enqueue(nearPoint);
-            nearPoint.exploredFrom = searchPoint;
-            print("Добавить в очередь: " + nearPoint);
+            nearPoint.exploredFrom = searchPoint; 
         }
-            
-        
     }
 
     private void LoadBlocks()
@@ -96,7 +114,7 @@ public class PathFinder : MonoBehaviour
             Vector2Int gridPos = wayPoint.GetGridPos();
 
             if (grid.ContainsKey(gridPos))
-                Debug.LogWarning(wayPoint);
+                Debug.LogWarning("Повтор блока: " + wayPoint);
             else
                 grid.Add(gridPos, wayPoint);   
         }
@@ -105,6 +123,5 @@ public class PathFinder : MonoBehaviour
     private void SetColorPoints()
     {
         startPoint.SetTopColor(Color.red);
-        finishPoint.SetTopColor(Color.yellow);
     }
 }
