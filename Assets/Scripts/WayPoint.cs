@@ -10,6 +10,8 @@ public class WayPoint : MonoBehaviour
 
     private const int gridSize = 10;
 
+    public bool isPlaceable = true;
+
     //private Vector2Int gridPos;
 
     public Vector2Int GetGridPos()
@@ -33,5 +35,11 @@ public class WayPoint : MonoBehaviour
     public IEnumerator GetEnumerator()
     {
         return (IEnumerator)this;
+    }
+
+    private void OnMouseOver()
+    {
+        if (Input.GetMouseButtonDown(0))
+            Debug.Log("Click");
     }
 }

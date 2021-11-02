@@ -45,16 +45,24 @@ public class PathFinder : MonoBehaviour
 
     private void CreatePath()
     {
-        path.Add(finishPoint);
+        AddPointToPath(finishPoint);
         WayPoint prevPoints = finishPoint.exploredFrom;
+
         while (prevPoints != startPoint)
         {
             prevPoints.SetTopColor(Color.cyan);
-            path.Add(prevPoints);
+            AddPointToPath(prevPoints);
             prevPoints = prevPoints.exploredFrom;
         }
-        path.Add(startPoint);
+
+        AddPointToPath(startPoint);
         path.Reverse();
+    }
+
+    private void AddPointToPath(WayPoint waypoint)
+    {
+        path.Add(waypoint);
+        waypoint.isPlaceable = false;
     }
 
     private void PathFind()

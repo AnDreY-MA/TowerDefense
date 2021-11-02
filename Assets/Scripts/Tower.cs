@@ -14,17 +14,48 @@ public class Tower : MonoBehaviour
 
     private void Update()
     {
-        towerTop.LookAt(targetEnemy);
+        SetTargetEnemy();
         var emission = bulletParticles.emission;
         if (targetEnemy)
+        {
+            towerTop.LookAt(targetEnemy.transform);
             Fire();
+        }           
         else
             Shoot(false);
+    }
+
+    private void SetTargetEnemy()
+    {
+        var sceneEnemies = FindObjectsOfType<EnemyDamage>();
+
+        if (sceneEnemies.Length > 0)
+        {
+            Transform closestEnemy = sceneEnemies[0].transform;
+
+            foreach (EnemyDamage test in sceneEnemies)
+            {
+                closestEnemy = GetClosestEnemy(closestEnemy.transform , test.transform);
+            }
+
+            targetEnemy = closestEnemy;
+        }
+    }
+
+    private Transform GetClosestEnemy(Transform enemy1, Transform enemy2)
+    {
+        var distToOne = Vector3.Distance(enemy1.position, transform.position);
+        var distToTwo = Vector3.Distance(enemy2.position, transform.position);
+
+        if (distToOne < distToTwo)
+            return enemy1;
+        else 
+            return enemy2;
     }
      
     private void Fire()
     {
-        float distanceToEnemy = Vector3.Distance(targetEnemy.position, transform.position);
+        float distanceToEnemy = Vector3.Distance(targetEnemy.transform.position, transform.position);
 
         if (distanceToEnemy <= shootRange)
             Shoot(true);
